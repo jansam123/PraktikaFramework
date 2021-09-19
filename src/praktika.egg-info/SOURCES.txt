@@ -1,0 +1,13 @@
+LICENSE
+pyproject.toml
+setup.cfg
+setup.py
+src/praktika/__init__.py
+src/praktika/classMA.py
+src/praktika/functions.py
+src/praktika.egg-info/PKG-INFO
+src/praktika.egg-info/SOURCES.txt
+src/praktika.egg-info/dependency_links.txt
+src/praktika.egg-info/not-zip-safe
+src/praktika.egg-info/requires.txt
+src/praktika.egg-info/top_level.txt

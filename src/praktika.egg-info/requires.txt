@@ -1,0 +1,5 @@
+qexpy>=2.0
+numpy>=1.21
+pandas>=1.2
+matplotlib>=3.4
+regex>=2.2
