@@ -5,7 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import container
 import re
-import matplotlib
+import seaborn as sns
+import matplotlib.style as style
 # import locale
 # Set to German locale to get comma decimal separater
 # locale.setlocale(locale.LC_NUMERIC, "sk_SK.utf8")
@@ -14,10 +15,21 @@ plt.rcdefaults()
 
 # Tell matplotlib to use the locale we set above
 plt.rcParams['axes.formatter.use_locale'] = True
+sns.set_context('paper')
+style.use('ggplot')
+plt.rcParams.update({
+    "font.family": "monospace",
+    "xtick.labelsize": 10,
+    "ytick.labelsize": 10,
+    "legend.fontsize": 11,
+    "text.color": "black",
+    'axes.labelcolor': "black",
+    'xtick.color': 'black',
+    'ytick.color': 'black',
+    })
+#sns.set_palette("pastel")
 
-
-def plot(xdata, ydata, xlabel=None, ylabel=None, ax=None, fname=None, fmt='o', label=None):
-
+def plot(xdata, ydata, xlabel=None, ylabel=None, ax=None, fname=None, fmt='o', label=None, color=None): 
     own_fig = False
     if ax is None:
         own_fig = True
@@ -25,7 +37,8 @@ def plot(xdata, ydata, xlabel=None, ylabel=None, ax=None, fname=None, fmt='o', l
     else:
         self_ax = ax
 
-    self_ax.errorbar(xdata.values, ydata.values, yerr=ydata.errors, fmt=fmt, label=label, capsize=4, ms=8)
+    self_ax.grid(False)
+    self_ax.errorbar(xdata.values, ydata.values, yerr=ydata.errors, fmt=fmt, label=label, capsize=4, ms=8, color=color)
     
     if xlabel is not None:
         self_ax.set_xlabel(xlabel)
@@ -46,7 +59,7 @@ def plot(xdata, ydata, xlabel=None, ylabel=None, ax=None, fname=None, fmt='o', l
     
     handles, labels = self_ax.get_legend_handles_labels()
     handles = [h[0] if isinstance(h, container.ErrorbarContainer) else h for h in handles]
-    self_ax.legend(handles, labels)                            
+    self_ax.legend(handles, labels,facecolor='white')                            
 
     if fname is not None:
         plt.savefig(fname + '.png')
@@ -74,9 +87,8 @@ def fitNplot(xdata, ydata, model, guess, xlabel=None, ylabel=None, ax=None, fnam
     params = [exp_val.value for exp_val in fit.params]
     x_fit = np.linspace(xdata.values.min(), xdata.values.max(), 10 * len(xdata.values))
     model_vals = model(x_fit, *params)
-    self_ax.plot(x_fit, model_vals, model_fmt, zorder=10)
-
-    self_ax = plot(xdata, ydata, xlabel, ylabel, self_ax, fname, fmt1, label)
+    line = self_ax.plot(x_fit, model_vals, model_fmt, zorder=10)
+    self_ax = plot(xdata, ydata, xlabel, ylabel, self_ax, fname, fmt1, label, color=line[-1].get_color())
 
     if own_fig:
         return fit.params, self_ax, fig
