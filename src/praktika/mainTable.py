@@ -29,11 +29,12 @@ class Table(object):
             col_name = self.add_col(col, apply_err, inline_error)
             if type(index) is int and col_id == index:
                 self.index = col_name
+        
 
 
     def add_col(self, col, apply_err=True, inline_err=False):
         values, errors = self.set_val_err(col)
-        if errors is None:
+        if errors is None or np.all(np.array(errors) == errors[0]):
             apply_err = False
         name = col.name
 
@@ -51,7 +52,8 @@ class Table(object):
         if inline_err and apply_err:
             inline_values = []
             for val, err in zip(values, errors):
-                inline_values += r"${} \pm {}$".format(val, err).replace('.', ',')
+                inline_values += [r"${} \pm {}$".format(val, err).replace('.', ',')]
+
             self.df[col_name] = inline_values 
         elif apply_err:
             self.df[col_name] = values
@@ -63,20 +65,28 @@ class Table(object):
         
 
     def set_val_err(self, col):
+        values = []
         if np.any(col.errors == 0):
-            values = np.round_(col.values, 1)
+            for val in col.values:
+                if val == 0:
+                    values += [int(val)]
+                else:
+                    round_val = round(val, 0)
+                    round_val = int(round_val)
+                    values += [str(round_val).replace('.', ',')]
             return values, None
 
         errors = []
-        values = []
         for err, val in zip(col.errors, col.values):
             round_err = round(err, fce.first_sgn(err))
             round_val = round(val, fce.first_sgn(round_err))
-            if round_err > 1:
+
+            if round_err >= 1:
                 round_err = int(round_err)
                 round_val = int(round_val)
-            errors += [round_err]
-            values += [round_val]
+
+            errors += [str(round_err).replace('.', ',')]
+            values += [str(round_val).replace('.', ',')]
         return values, errors
 
     def round_list(self, list, digit):
