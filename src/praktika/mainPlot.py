@@ -13,7 +13,7 @@ import praktika.functions as fce
 class Plot(object):
 
     def __init__(self, xdata, ydata, xlabel=None, ylabel=None, ax=None, fig=None, fname=None, 
-                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-'): 
+                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True): 
         self.xdata = xdata
         self.ydata = ydata
         self.set_visual()
@@ -26,7 +26,7 @@ class Plot(object):
 
         if None not in [model, guess]:
             self.fit(model, guess, exclude)
-            self.plot_fit(model, fmt=model_fmt)
+            self.plot_fit(model, fmt=model_fmt, show_dispersion=show_dispersion)
         self.label(xlabel, 'x')
         self.label(ylabel, 'y')        
         self.legend()
@@ -71,12 +71,16 @@ class Plot(object):
         self.params = [exp_val.value for exp_val in fit.params]
         self.params_err = [exp_val.error for exp_val in fit.params]
     
-    def plot_fit(self, model, npoints=None, fmt='-'):
+    def plot_fit(self, model, npoints=None, fmt='-', show_dispersion=True):
         if npoints is None:
             npoints=20*len(self.xdata.values)
         x_fit = np.linspace(self.xdata.values.min(), self.xdata.values.max(), npoints)
         model_vals = model(x_fit, *self.params)
         self.ax.plot(x_fit, model_vals, fmt, zorder=10, color=self.color)
+        if show_dispersion:
+            model_valsPlus = model(x_fit, *[param + err for param, err in zip(self.params,self.params_err)])
+            model_valsMinus = model(x_fit,*[param - err for param, err in zip(self.params,self.params_err)])
+            self.ax.fill_between(x_fit, model_valsMinus, model_valsPlus, color=self.color, alpha=0.35)
 
 
     def save(self, fname):
@@ -100,6 +104,11 @@ class Plot(object):
             "text.color": "black",
             'axes.labelcolor': "black",
             'xtick.color': 'black',
-            'ytick.color': 'black',
+            'ytick.color': '#050340',
+            "axes.facecolor"    : "#050340",   
+            "figure.facecolor"  : "#c0bfc9",  
+            "figure.edgecolor"  : "#c0bfc9",   
+
             })
+
 
