@@ -1,7 +1,5 @@
-import pandas as pd
 
-
-class latexTable(object):
+class LatexTable(object):
 
     def __init__(self, df, fname, index=False, label=''):
 

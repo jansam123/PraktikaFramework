@@ -2,18 +2,18 @@ import qexpy as q
 import numpy as np
 
 
-class MA(q.MeasurementArray):
+class Data(q.MeasurementArray):
 
     def set_un(self, unit):
         self.un = unit 
 
-    def add_MA(self, MeasurementArrays):
+    def add_Data(self, MeasurementArrays):
         data = self.values
         err = self.errors
         for measArr in MeasurementArrays:
             data = np.append(data, measArr.values)
             err = np.append(err, measArr.errors)
-        return MA(data, err)
+        return Data(data, err)
 
     def avg(self):
         sum_of_squares = sum([error**2 for error in self.errors])

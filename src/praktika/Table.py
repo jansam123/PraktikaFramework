@@ -1,8 +1,7 @@
-import qexpy as q
 import numpy as np
 import pandas as pd
 import praktika.functions as fce
-import praktika.latexTable as tab
+import praktika.LatexTable as tab
 
 
 
@@ -107,9 +106,9 @@ class Table(object):
 
         elif save_as == 'tex':
             if isinstance(self.index, pd.Series): 
-                tab.latexTable(self.df, fname, True, label=fname.split('/')[-1])
+                tab.LatexTable(self.df, fname, True, label=fname.split('/')[-1])
             else:
-                tab.latexTable(self.df, fname, label=fname.split('/')[-1])
+                tab.LatexTable(self.df, fname, label=fname.split('/')[-1])
 
         elif save_as == 'latex':
             self.df.to_latex(fname + '.tex', escape=False, multirow=True, multicolumn=True)
