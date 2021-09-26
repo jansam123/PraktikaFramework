@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 import praktika.functions as fce
-import praktika.LatexTable as tab
+from praktika.LatexTable import LatexTable 
 
 
 
 class Table(object):
 
-    def __init__(self, columns, index=0, ignore_error=[], inline_error=False, save=None, fname='data_to_table'):
+    def __init__(self, columns, index=0, ignore_error=[], inline_error=False, save='tex', fname='data_to_table'):
         self.columns = columns
         self.col_names = []
         self.df = pd.DataFrame()
@@ -25,7 +25,7 @@ class Table(object):
     def add_all_col(self, index, inline_error, ignore_error):
         for col_id, col in enumerate(self.columns):
             apply_err = False if col_id in ignore_error else True
-            col_name = self.add_col(col, apply_err, inline_error)
+            col_name = self.add_col(col, apply_err=apply_err, inline_err=inline_error)
             if type(index) is int and col_id == index:
                 self.index = col_name
         
@@ -79,13 +79,12 @@ class Table(object):
         for err, val in zip(col.errors, col.values):
             round_err = round(err, fce.first_sgn(err))
             round_val = round(val, fce.first_sgn(round_err))
-
             if round_err >= 1:
                 round_err = int(round_err)
                 round_val = int(round_val)
 
-            errors += [str(round_err).replace('.', ',')]
-            values += [str(round_val).replace('.', ',')]
+            errors += [f'{round_err}'.replace('.', ',')]
+            values += [f'{round_val}'.replace('.', ',')]
         return values, errors
 
     def round_list(self, list, digit):
@@ -106,9 +105,9 @@ class Table(object):
 
         elif save_as == 'tex':
             if isinstance(self.index, pd.Series): 
-                tab.LatexTable(self.df, fname, True, label=fname.split('/')[-1])
+                LatexTable(self.df, fname, True, label=fname.split('/')[-1])
             else:
-                tab.LatexTable(self.df, fname, label=fname.split('/')[-1])
+                LatexTable(self.df, fname, label=fname.split('/')[-1])
 
         elif save_as == 'latex':
             self.df.to_latex(fname + '.tex', escape=False, multirow=True, multicolumn=True)

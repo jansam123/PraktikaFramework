@@ -1,5 +1,5 @@
 import pandas as pd
-import praktika.Data as dat
+from  praktika import Data 
 
 class LoadData(object):
 
@@ -19,12 +19,12 @@ class LoadData(object):
             for col in self.np:
                 err = col[0]
                 if type(err) is str:
-                    self.out += [dat.Data(col[1:], self.dif_err(col[0], col[1:]))]
+                    self.out += [Data(col[1:], self.dif_err(col[0], col[1:]))]
                 else:
-                    self.out += [dat.Data(col[1:], err)]
+                    self.out += [Data(col[1:], err)]
                     
         else:
-            self.out = [dat.Data(col) for col in self.np]
+            self.out = [Data(col) for col in self.np]
         
 
     def load(self, fname, file_type, separator, decimal):

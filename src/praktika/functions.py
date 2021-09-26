@@ -12,10 +12,12 @@ first_sgn = np.vectorize(first_sqn)
 
 def unit_to_latex(string, plt=None):
     if plt is None:
-        return re.sub(r"([a-zA-Z]+)", r'\\text{\1}', string)
+        text_style = 'text'
     else:
-        return re.sub(r"([a-zA-Z]+)", r'\\mathrm{\1}', string)
+        text_style = 'mathrm'
 
-
-
+    out = re.sub(r"([a-zA-Z]+)", r'\\'+text_style+r'{\1}', string)
+   
+    out = re.sub(r"\\\\"+text_style+r"{([^}]*)}", r'\ \1' , out).replace(' ', '')
+    return out
 

@@ -29,7 +29,8 @@ class Plot(object):
             self.plot_fit(model, fmt=model_fmt, show_dispersion=show_dispersion)
         self.label(xlabel, 'x')
         self.label(ylabel, 'y')        
-        self.legend()
+        if label is not None:
+            self.legend()
         self.save(fname)
                             
 
