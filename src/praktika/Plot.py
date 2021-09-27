@@ -13,16 +13,23 @@ import praktika.functions as fce
 class Plot(object):
 
     def __init__(self, xdata, ydata, xlabel=None, ylabel=None, ax=None, fig=None, fname=None, 
-                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True): 
+                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True, no_errbar=False, no_points=False): 
         self.xdata = xdata
         self.ydata = ydata
         self.set_visual()
         self.set_axis(ax, fig)
+        self.no_points = no_points
+        self.leg_label = label
 
         self.ax.grid(grid)
-
-        points = self.ax.errorbar(self.xdata.values, self.ydata.values, yerr=self.ydata.errors, fmt=fmt, label=label, capsize=4, ms=8, color=color)
-        self.color = points[-1][-1].get_color()
+        if no_errbar:
+            points = self.ax.plot(self.xdata.values, self.ydata.values, fmt=fmt, label=label, ms=8, color=color)
+            self.color = points[-1][-1].get_color()
+        elif no_points:
+            self.color = None
+        else:
+            points = self.ax.errorbar(self.xdata.values, self.ydata.values, yerr=self.ydata.errors, fmt=fmt, label=label, capsize=4, ms=8, color=color)
+            self.color = points[-1][-1].get_color()
 
         if None not in [model, guess]:
             self.fit(model, guess, exclude)
@@ -71,13 +78,18 @@ class Plot(object):
 
         self.params = [exp_val.value for exp_val in fit.params]
         self.params_err = [exp_val.error for exp_val in fit.params]
+        self.regress_coeff = fit.params
     
     def plot_fit(self, model, npoints=None, fmt='-', show_dispersion=True):
         if npoints is None:
             npoints=20*len(self.xdata.values)
         x_fit = np.linspace(self.xdata.values.min(), self.xdata.values.max(), npoints)
         model_vals = model(x_fit, *self.params)
-        self.ax.plot(x_fit, model_vals, fmt, zorder=10, color=self.color)
+        if self.no_points:
+            label = self.leg_label
+        else:
+            label = None
+        self.ax.plot(x_fit, model_vals, fmt, zorder=10, color=self.color, label=label)
         if show_dispersion:
             model_valsPlus = model(x_fit, *[param + err for param, err in zip(self.params,self.params_err)])
             model_valsMinus = model(x_fit,*[param - err for param, err in zip(self.params,self.params_err)])
