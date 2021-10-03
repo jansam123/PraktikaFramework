@@ -5,21 +5,24 @@ from matplotlib import container
 import seaborn as sns
 import matplotlib.style as style
 import praktika.functions as fce
+from scipy.interpolate import make_interp_spline
 
-# import locale
-# locale.setlocale(locale.LC_NUMERIC, "sk_SK.utf8")
+import locale
+locale.setlocale(locale.LC_NUMERIC, "de_DE")
 
 
 class Plot(object):
 
     def __init__(self, xdata, ydata, xlabel=None, ylabel=None, ax=None, fig=None, fname=None, 
-                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True, no_errbar=False, no_points=False): 
+                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True, no_errbar=False, no_points=False, degree=None, spline=False): 
         self.xdata = xdata
         self.ydata = ydata
         self.set_visual()
         self.set_axis(ax, fig)
         self.no_points = no_points
         self.leg_label = label
+        self.degree = degree
+
 
         self.ax.grid(grid)
         if no_errbar:
@@ -34,10 +37,26 @@ class Plot(object):
         if None not in [model, guess]:
             self.fit(model, guess, exclude)
             self.plot_fit(model, fmt=model_fmt, show_dispersion=show_dispersion)
+
+        if spline:
+            if exclude is not None:
+                x = xdata.delete(exclude).values
+                y = ydata.delete(exclude).values
+            else:
+                x = xdata.values
+                y = ydata.values
+                
+            X_Y_Spline = make_interp_spline(x, y)
+            X_ = np.linspace(x.min(), x.max(), 500)
+            Y_ = X_Y_Spline(X_)
+            self.ax.plot(X_, Y_, color=self.color)
+
         self.label(xlabel, 'x')
         self.label(ylabel, 'y')        
         if label is not None:
             self.legend()
+
+
         self.save(fname)
                             
 
@@ -72,9 +91,9 @@ class Plot(object):
 
     def fit(self, model, guess, exclude=None):
         if exclude is not None:
-            fit = q.fit(self.xdata.delete(exclude), self.ydata.delete(exclude), model, parguess=guess)    
+            fit = q.fit(self.xdata.delete(exclude), self.ydata.delete(exclude), model, parguess=guess, degree=self.degree)    
         else:
-            fit = q.fit(self.xdata, self.ydata, model, parguess=guess)    
+            fit = q.fit(self.xdata, self.ydata, model, parguess=guess, degree=self.degree)
 
         self.params = [exp_val.value for exp_val in fit.params]
         self.params_err = [exp_val.error for exp_val in fit.params]
@@ -119,9 +138,9 @@ class Plot(object):
             'xtick.color': 'black',
             'ytick.color': '#050340',
             "axes.facecolor"    : "#050340",   
-            "figure.facecolor"  : "#c0bfc9",  
-            "figure.edgecolor"  : "#c0bfc9",   
-
+            "figure.facecolor"  : "#e1e1e6",  
+            "figure.edgecolor"  : "#e1e1e6",   
+            "axes.formatter.use_locale" : True
             })
 
 

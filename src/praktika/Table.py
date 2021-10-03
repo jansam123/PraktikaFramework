@@ -33,7 +33,7 @@ class Table(object):
 
     def add_col(self, col, apply_err=True, inline_err=False):
         values, errors = self.set_val_err(col)
-        if errors is None or np.all(np.array(errors) == errors[0]):
+        if errors is None: #or np.all(np.array(errors) == errors[0]):
             apply_err = False
         name = col.name
 
@@ -83,8 +83,12 @@ class Table(object):
                 round_err = int(round_err)
                 round_val = int(round_val)
 
-            errors += [f'{round_err}'.replace('.', ',')]
-            values += [f'{round_val}'.replace('.', ',')]
+            error = f'{round_err}'.replace('.', ',')
+            value = f'{round_val}'.replace('.', ',')
+            while len(value) < len(error):
+                value += '0'
+            errors += [error]
+            values += [value]
         return values, errors
 
     def round_list(self, list, digit):
