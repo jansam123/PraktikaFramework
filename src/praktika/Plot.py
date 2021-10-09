@@ -14,7 +14,8 @@ locale.setlocale(locale.LC_NUMERIC, "de_DE")
 class Plot(object):
 
     def __init__(self, xdata, ydata, xlabel=None, ylabel=None, ax=None, fig=None, fname=None, 
-                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True, no_errbar=False, no_points=False, degree=None, spline=False): 
+                 fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True, 
+                 no_errbar=False, no_points=False, degree=None, spline=False, graph_save_path = 'LaTeX/graphs/'): 
         self.xdata = xdata
         self.ydata = ydata
         self.set_visual()
@@ -22,9 +23,11 @@ class Plot(object):
         self.no_points = no_points
         self.leg_label = label
         self.degree = degree
+        self.graph_save_path = graph_save_path
 
 
         self.ax.grid(grid)
+
         if no_errbar:
             points = self.ax.plot(self.xdata.values, self.ydata.values, fmt=fmt, label=label, ms=8, color=color)
             self.color = points[-1][-1].get_color()
@@ -55,8 +58,6 @@ class Plot(object):
         self.label(ylabel, 'y')        
         if label is not None:
             self.legend()
-
-
         self.save(fname)
                             
 
@@ -117,7 +118,7 @@ class Plot(object):
 
     def save(self, fname):
         if fname is not None:
-            self.fig.savefig(fname + '.png')
+            self.fig.savefig(self.graph_save_path+fname + '.png')
 
 
     def get_fig(self):
@@ -136,10 +137,10 @@ class Plot(object):
             "text.color": "black",
             'axes.labelcolor': "black",
             'xtick.color': 'black',
-            'ytick.color': '#050340',
-            "axes.facecolor"    : "#050340",   
-            "figure.facecolor"  : "#e1e1e6",  
-            "figure.edgecolor"  : "#e1e1e6",   
+            'ytick.color': 'black',
+            "axes.facecolor"    : "#c7ddff",   
+            "figure.facecolor"  : "#f2f2f2",  
+            "figure.edgecolor"  : "#ffffff",   
             "axes.formatter.use_locale" : True
             })
 

@@ -7,7 +7,7 @@ from praktika.LatexTable import LatexTable
 
 class Table(object):
 
-    def __init__(self, columns, index=0, ignore_error=[], inline_error=False, save='tex', fname='data_to_table'):
+    def __init__(self, columns, index=0, ignore_error=[], inline_error=False, save='tex', fname='data_to_table', graph_save_path='LaTeX/tables/'):
         self.columns = columns
         self.col_names = []
         self.df = pd.DataFrame()
@@ -19,7 +19,7 @@ class Table(object):
         self.set_index()
 
         if save is not None:
-            self.save(save, fname)
+            self.save(save, graph_save_path+fname)
 
 
     def add_all_col(self, index, inline_error, ignore_error):
