@@ -6,24 +6,37 @@ import seaborn as sns
 import matplotlib.style as style
 import praktika.functions as fce
 from scipy.interpolate import make_interp_spline
-
 import locale
+from praktika.Data import Data
+from typing import Protocol
+
 locale.setlocale(locale.LC_NUMERIC, "de_DE")
 
 
-class Plot(object):
+class PlottingStyle(Protocol):
+    """Base class for various plot styles"""
 
-    def __init__(self, xdata, ydata, xlabel=None, ylabel=None, ax=None, fig=None, fname=None, 
+    def add_plot(self, ax) -> None:
+        """Adds plot to given axis"""
+    
+
+class Plot:
+
+    def __init__(self, xdata:Data, ydata:Data, xlabel: str = '', ylabel: str = '', ax=None, fig=None, file_name: str = '', 
                  fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True, 
-                 no_errbar=False, no_points=False, degree=None, spline=False, graph_save_path = 'LaTeX/graphs/'): 
+                 no_errbar=False, no_points=False, degree=None, spline=False, graph_save_path = 'LaTeX/graphs/', y2data=None, color2= None, fmt2 = 'v', label2=None) -> None: 
+
         self.xdata = xdata
         self.ydata = ydata
+        self.y2data = y2data
         self.set_visual()
         self.set_axis(ax, fig)
         self.no_points = no_points
         self.leg_label = label
         self.degree = degree
         self.graph_save_path = graph_save_path
+        self.color2 = color2
+        self.fmt2 = fmt2
 
 
         self.ax.grid(grid)
@@ -36,30 +49,39 @@ class Plot(object):
         else:
             points = self.ax.errorbar(self.xdata.values, self.ydata.values, yerr=self.ydata.errors, fmt=fmt, label=label, capsize=4, ms=8, color=color)
             self.color = points[-1][-1].get_color()
+        
+        if self.y2data is not None:
+            self.ax2 = self.ax.twinx()
+            self.ax2.errorbar(self.xdata.values, self.y2data.values, yerr=self.y2data.errors, capsize=4, ms=8, fmt=self.fmt2, color=self.color2, label=label2)
+            self.label(ylabel, 'y', twinx=True)
+            self.ax2.grid(grid)
 
         if None not in [model, guess]:
             self.fit(model, guess, exclude)
             self.plot_fit(model, fmt=model_fmt, show_dispersion=show_dispersion)
 
         if spline:
-            if exclude is not None:
-                x = xdata.delete(exclude).values
-                y = ydata.delete(exclude).values
-            else:
-                x = xdata.values
-                y = ydata.values
-                
-            X_Y_Spline = make_interp_spline(x, y)
-            X_ = np.linspace(x.min(), x.max(), 500)
-            Y_ = X_Y_Spline(X_)
-            self.ax.plot(X_, Y_, color=self.color)
+            self.set_spline(exclude)
 
         self.label(xlabel, 'x')
         self.label(ylabel, 'y')        
         if label is not None:
             self.legend()
-        self.save(fname)
+        self.save(file_name)
                             
+    def set_spline(self, exclude):
+        if exclude is not None:
+            x = self.xdata.delete(exclude).values
+            y = self.ydata.delete(exclude).values
+        else:
+            x = self.xdata.values
+            y = self.ydata.values
+            
+        X_Y_Spline = make_interp_spline(x, y)
+        X_ = np.linspace(x.min(), x.max(), 500)
+        Y_ = X_Y_Spline(X_)
+        self.ax.plot(X_, Y_, color=self.color)
+
 
     def set_axis(self, ax, fig):
         if ax is None:
@@ -69,12 +91,20 @@ class Plot(object):
             self.fig = fig
 
 
-    def label(self, label, axis):
-        label_attr = getattr(self.ax, f'set_{axis}label')
-        if label is not None:
+    def label(self, label: str, axis: str, twinx: bool = False) -> None:
+        if not twinx:
+            ax = self.ax
+        else:
+            ax = self.ax2
+            
+        label_attr = getattr(ax, f'set_{axis}label')
+        if label != '':
             label_attr(label)
-        elif getattr(self.ax, f'{axis}axis').get_label().get_text() == '':
-            data = getattr(self, f'{axis}data')
+        elif getattr(ax, f'{axis}axis').get_label().get_text() == '':
+            if not twinx:
+                data = getattr(self, f'{axis}data')
+            else:
+               data = getattr(self, f'{axis}2data')
             if hasattr(data, 'un') and hasattr(data, 'name'):
                 name = data.name
                 unit = fce.unit_to_latex(data.un, plt=True)
@@ -85,9 +115,12 @@ class Plot(object):
 
 
     def legend(self, facecolor='white'):
-        handles, labels = self.ax.get_legend_handles_labels()
-        handles = [h[0] if isinstance(h, container.ErrorbarContainer) else h for h in handles]
-        self.ax.legend(handles, labels, facecolor=facecolor)
+        if self.y2data is None:
+            handles, labels = self.fig.get_legend_handles_labels()
+            handles = [h[0] if isinstance(h, container.ErrorbarContainer) else h for h in handles]
+            self.ax.legend(handles, labels, facecolor=facecolor)
+        else:
+            self.fig.legend(facecolor=facecolor)
 
 
     def fit(self, model, guess, exclude=None):
@@ -113,11 +146,11 @@ class Plot(object):
         if show_dispersion:
             model_valsPlus = model(x_fit, *[param + err for param, err in zip(self.params,self.params_err)])
             model_valsMinus = model(x_fit,*[param - err for param, err in zip(self.params,self.params_err)])
-            self.ax.fill_between(x_fit, model_valsMinus, model_valsPlus, color=self.color, alpha=0.35)
+            self.ax.fill_between(x_fit, model_valsMinus, model_valsPlus, color=self.color, alpha=0.2)
 
 
-    def save(self, fname):
-        if fname is not None:
+    def save(self, fname: str) -> None:
+        if fname != '':
             self.fig.savefig(self.graph_save_path+fname + '.png')
 
 

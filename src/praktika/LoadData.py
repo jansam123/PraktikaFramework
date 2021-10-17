@@ -3,9 +3,9 @@ from  praktika import Data
 
 class LoadData(object):
 
-    def __init__(self, fname, error=True, to_numpy=False, separator=";", decimal=",", file_type='.xlsx'):
+    def __init__(self, file_name, error=True, to_numpy=False, separator=";", decimal=",", file_type='.xlsx'):
         self.out = []
-        self.load(fname, file_type, separator, decimal)
+        self.load(file_name, file_type, separator, decimal)
         self.to_numpy()
         if not to_numpy:
             self.to_Data(error)

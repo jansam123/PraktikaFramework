@@ -1,20 +1,24 @@
+from dataclasses import field, dataclass
+from enum import auto
+from pandas import DataFrame
 
+
+@dataclass
 class LatexTable(object):
+    df: DataFrame  
+    index:  auto() = None
+    label: str = ''
+    caption: str = ''
 
-    def __init__(self, df, fname, index=False, label=''):
-
-        self.df = df 
-        self.main = []
-        self.heading(tab_label=label)
+    def __call__(self, file_name: str) -> None:
+        self.heading(tab_label=self.label, caption=self.caption)
         self.index_row()
-        if index:
+        if self.index:
             self.multirow()
         else:
             self.row()
         self.ending()
-        self.save(fname)
-
-
+        self.save(file_name)
 
 
     def row(self):
@@ -22,7 +26,7 @@ class LatexTable(object):
             row_string = f'{idx_val}  &'
             for col_num, _ in enumerate(self.df.keys()):
                 row_string += f'  {self.df.iloc[idx,col_num]}  &'
-            self.main += [row_string[:-1] + r'\\']
+            self.output_string += [row_string[:-1] + r'\\']
 
             
 
@@ -42,22 +46,22 @@ class LatexTable(object):
 
             if new_multirow_num <= old_multirow_num:
                 multi_bool = True
-                self.main[-old_multirow_num] = self.main[-old_multirow_num].replace('...', f'{old_multirow_num}')
+                self.output_string[-old_multirow_num] = self.output_string[-old_multirow_num].replace('...', f'{old_multirow_num}')
             multirow_num = new_multirow_num
 
             if multi_bool and idx != len(self.df.index): 
-                self.main[-1] = self.main[-1] + r' \hline'
+                self.output_string[-1] = self.output_string[-1] + r' \hline'
             old_multirow_num = multirow_num
 
             for col_num, _ in enumerate(self.df.keys()):
                 row += f'  {self.df.iloc[idx,col_num]}  &'
-            self.main += [row[:-1] + r'\\']
-        self.main[-old_multirow_num] = self.main[-old_multirow_num].replace('...', f'{old_multirow_num}')
+            self.output_string += [row[:-1] + r'\\']
+        self.output_string[-old_multirow_num] = self.output_string[-old_multirow_num].replace('...', f'{old_multirow_num}')
 
 
     def save(self, fname):
         outfile = open(fname + '.tex', 'w')
-        for val in self.main:
+        for val in self.output_string:
             outfile.write(val + '\n')
         outfile.close()
 
@@ -67,8 +71,8 @@ class LatexTable(object):
             col_names += r'  \begin{tabular}[c]{@{}c@{}} ' + col + r' \end{tabular}  &'
         col_names = col_names[:-1] 
         col_names += r'\\'
-        self.main += [col_names]
-        self.main += [r'\midrule']
+        self.output_string += [col_names]
+        self.output_string += [r'\midrule']
 
     def col_setup(self):
         col_setup = '{'
@@ -79,15 +83,16 @@ class LatexTable(object):
 
 
     def heading(self,  position='!htb', caption='', tab_label=''):
-        self.main += [r'\begin{table}[' + position + ']']
-        self.main += [r'\centering']
-        self.main += [r'\caption{' + caption + '}']
-        self.main += [r'\label{tab:' + tab_label + '}']
-        self.main += [r'\begin{tabular}' + self.col_setup()]
-        self.main += [r'\toprule']
+        self.output_string = []
+        self.output_string += [r'\begin{table}[' + position + ']']
+        self.output_string += [r'\centering']
+        self.output_string += [r'\caption{' + caption + '}']
+        self.output_string += [r'\label{tab:' + tab_label + '}']
+        self.output_string += [r'\begin{tabular}' + self.col_setup()]
+        self.output_string += [r'\toprule']
 
 
     def ending(self):
-        self.main += [r'\bottomrule', r'\end{tabular}', r'\end{table}']
+        self.output_string += [r'\bottomrule', r'\end{tabular}', r'\end{table}']
 
 
