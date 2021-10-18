@@ -1,5 +1,6 @@
 import pandas as pd
-from  praktika import Data 
+from praktika import Data
+
 
 class LoadData(object):
 
@@ -10,10 +11,9 @@ class LoadData(object):
         if not to_numpy:
             self.to_Data(error)
 
-
     def to_numpy(self):
         self.np = [self.df[col].dropna().to_numpy() for col in self.df]
-        
+
     def to_Data(self, error):
         if error:
             for col in self.np:
@@ -22,10 +22,9 @@ class LoadData(object):
                     self.out += [Data(col[1:], self.dif_err(col[0], col[1:]))]
                 else:
                     self.out += [Data(col[1:], err)]
-                    
+
         else:
             self.out = [Data(col) for col in self.np]
-        
 
     def load(self, fname, file_type, separator, decimal):
         fname = fname + file_type
@@ -37,10 +36,11 @@ class LoadData(object):
     def dif_err(self, string, values):
         string = string.replace(' ', '').replace(',', '.')
         string = string.split('+')
-        relative = float([val for val in string if '%' in val][0].replace('%', ''))
+        relative = float([val for val in string if '%' in val]
+                         [0].replace('%', ''))
         absolute = float([val for val in string if '%' not in val][0])
         return [val*relative*1e-2 + absolute for val in values]
-        
+
     def __str__(self):
         out = ''
         for val in self.out:

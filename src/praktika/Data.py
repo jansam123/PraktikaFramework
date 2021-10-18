@@ -5,7 +5,7 @@ import numpy as np
 class Data(q.MeasurementArray):
 
     def set_un(self, unit):
-        self.un = unit 
+        self.un = unit
 
     def add_Data(self, MeasurementArrays):
         data = self.values
