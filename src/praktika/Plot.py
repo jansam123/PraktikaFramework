@@ -13,6 +13,9 @@ from typing import Protocol
 
 locale.setlocale(locale.LC_NUMERIC, "de_DE")
 
+ggplot_colors = {'red': '#E24A33', 'blue': '#348ABD',
+                 'magenta': '#988ED5', 'gray': '#777777', 'yellow': '#FBC15E', 'green': '#8EBA42', 'pink': '#FFB5B8'}
+
 
 class PlottingStyle(Protocol):
     """Base class for various plot styles"""
@@ -146,7 +149,7 @@ class Plot:
 
     def legend(self, facecolor='white'):
         if self.y2data is None:
-            handles, labels = self.fig.get_legend_handles_labels()
+            handles, labels = self.ax.get_legend_handles_labels()
             handles = [h[0] if isinstance(
                 h, container.ErrorbarContainer) else h for h in handles]
             self.ax.legend(handles, labels, facecolor=facecolor)

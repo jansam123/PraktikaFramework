@@ -15,16 +15,17 @@ class LoadData(object):
         self.np = [self.df[col].dropna().to_numpy() for col in self.df]
 
     def to_Data(self, error):
-        if error:
-            for col in self.np:
-                err = col[0]
-                if type(err) is str:
-                    self.out += [Data(col[1:], self.dif_err(col[0], col[1:]))]
-                else:
-                    self.out += [Data(col[1:], err)]
-
-        else:
+        if not error:
             self.out = [Data(col) for col in self.np]
+            return
+
+        for col in self.np:
+            err = col[0]
+            print(err)
+            if type(err) is str:
+                self.out += [Data(col[1:], self.dif_err(col[0], col[1:]))]
+            else:
+                self.out += [Data(col[1:], err)]
 
     def load(self, fname, file_type, separator, decimal):
         fname = fname + file_type
@@ -39,6 +40,8 @@ class LoadData(object):
         relative = float([val for val in string if '%' in val]
                          [0].replace('%', ''))
         absolute = float([val for val in string if '%' not in val][0])
+        print(relative, absolute)
+        print(values)
         return [val*relative*1e-2 + absolute for val in values]
 
     def __str__(self):
