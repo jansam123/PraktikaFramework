@@ -49,7 +49,7 @@ class LatexTable:
             multirow_num = new_multirow_num
 
             if multi_bool and idx != len(self.df.index):
-                self.output_string[-1] = self.output_string[-1] + r' \hline'
+                self.output_string[-1] = self.output_string[-1] 
             old_multirow_num = multirow_num
 
             for col_num, _ in enumerate(self.df.keys()):

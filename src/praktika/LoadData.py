@@ -7,6 +7,7 @@ class LoadData(object):
     def __init__(self, file_name, error=True, to_numpy=False, separator=";", decimal=",", file_type='.xlsx'):
         self.out = []
         self.load(file_name, file_type, separator, decimal)
+
         self.to_numpy()
         if not to_numpy:
             self.to_Data(error)
@@ -21,7 +22,7 @@ class LoadData(object):
 
         for col in self.np:
             err = col[0]
-            print(err)
+
             if type(err) is str:
                 self.out += [Data(col[1:], self.dif_err(col[0], col[1:]))]
             else:
@@ -40,9 +41,8 @@ class LoadData(object):
         relative = float([val for val in string if '%' in val]
                          [0].replace('%', ''))
         absolute = float([val for val in string if '%' not in val][0])
-        print(relative, absolute)
-        print(values)
-        return [val*relative*1e-2 + absolute for val in values]
+
+        return [abs(val)*relative*1e-2 + absolute for val in values]
 
     def __str__(self):
         out = ''

@@ -57,7 +57,7 @@ class Plot:
 
     def __init__(self, xdata: Data, ydata: Data, xlabel: str = '', ylabel: str = '', ax=None, fig=None, file_name: str = '',
                  fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True,
-                 no_errbar=False, no_points=False, degree=None, spline=False, graph_save_path='LaTeX/graphs/', y2data=None, color2=None, fmt2='v', label2=None) -> None:
+                 no_errbar=False, no_points=False, degree=None, spline=False, graph_save_path='LaTeX/graphs/', y2data=None, color2=None, fmt2='v', label2=None, ms=8) -> None:
 
         self.xdata = xdata
         self.ydata = ydata
@@ -70,24 +70,24 @@ class Plot:
         self.graph_save_path = graph_save_path
         self.color2 = color2
         self.fmt2 = fmt2
-
+        self.ms = ms
         self.ax.grid(grid)
 
         if no_errbar:
             points = self.ax.plot(
-                self.xdata.values, self.ydata.values, fmt=fmt, label=label, ms=8, color=color)
-            self.color = points[-1][-1].get_color()
+                self.xdata.values, self.ydata.values, fmt, label=label, ms=self.ms, color=color)
+            self.color = points[-1].get_color()
         elif no_points:
             self.color = None
         else:
             points = self.ax.errorbar(self.xdata.values, self.ydata.values,
-                                      yerr=self.ydata.errors, fmt=fmt, label=label, capsize=4, ms=8, color=color)
+                                      yerr=self.ydata.errors, fmt=fmt, label=label, capsize=4, ms=self.ms, color=color)
             self.color = points[-1][-1].get_color()
 
         if self.y2data is not None:
             self.ax2 = self.ax.twinx()
             self.ax2.errorbar(self.xdata.values, self.y2data.values, yerr=self.y2data.errors,
-                              capsize=4, ms=8, fmt=self.fmt2, color=self.color2, label=label2)
+                              capsize=4, ms=self.ms, fmt=self.fmt2, color=self.color2, label=label2)
             self.label(ylabel, 'y', twinx=True)
             self.ax2.grid(grid)
 
@@ -201,8 +201,8 @@ class Plot:
         style.use(mt_style)
         plt.rcParams.update({
             "font.family": "monospace",
-            "xtick.labelsize": 10,
-            "ytick.labelsize": 10,
+            "xtick.labelsize": 11,
+            "ytick.labelsize": 11,
             "legend.fontsize": 11,
             "text.color": "black",
             'axes.labelcolor': "black",
