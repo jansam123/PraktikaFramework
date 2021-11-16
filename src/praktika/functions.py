@@ -5,10 +5,15 @@ import re
 
 
 def first_sqn(x):
-    return -int(np.floor(np.log10(abs(x))))
+    if x != 0:
+        return -int(np.floor(np.log10(abs(x))))
+    else:
+        return 0
 
 
 first_sgn = np.vectorize(first_sqn)
+
+
 
 
 def unit_to_latex(string, plt=None):
