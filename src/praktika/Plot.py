@@ -9,7 +9,6 @@ import praktika.functions as fce
 from scipy.interpolate import make_interp_spline
 import locale
 from praktika.Data import Data
-from typing import Protocol
 
 locale.setlocale(locale.LC_NUMERIC, "de_DE")
 
@@ -17,47 +16,11 @@ ggplot_colors = {'red': '#E24A33', 'blue': '#348ABD',
                  'magenta': '#988ED5', 'gray': '#777777', 'yellow': '#FBC15E', 'green': '#8EBA42', 'pink': '#FFB5B8'}
 
 
-class PlottingStyle(Protocol):
-    """Base class for various plot styles"""
-
-    def add_plot(self, ax) -> None:
-        """Adds plot to given axis"""
-
-
-@dataclass
-class PlotDataClass:
-    xdata: Data
-    ydata: Data
-    xlabel: str = ''
-    ylabel: str = ''
-    ax = None,
-    fig = None
-    file_name: str = ''
-    fmt = 'o'
-    label = None
-    color = None
-    exclude = None
-    grid = False
-    model = None
-    guess = None
-    model_fmt = '-'
-    show_dispersion = True,
-    no_errbar = False
-    no_points = False
-    degree = None
-    spline = False
-    graph_save_path = 'LaTeX/graphs/'
-    y2data = None
-    color2 = None
-    fmt2 = 'v'
-    label2 = None
-
-
 class Plot:
 
     def __init__(self, xdata: Data, ydata: Data, xlabel: str = '', ylabel: str = '', ax=None, fig=None, file_name: str = '',
                  fmt='o', label=None, color=None, exclude=None, grid=False, model=None, guess=None, model_fmt='-', show_dispersion=True,
-                 no_errbar=False, no_points=False, degree=None, spline=False, graph_save_path='LaTeX/graphs/', y2data=None, color2=None, fmt2='v', label2=None, ms=8) -> None:
+                 no_errbar=False, no_points=False, degree=None, spline=False, graph_save_path='LaTeX/graphs/', y2data=None, color2=None, fmt2='v', label2=None, ms=8, lw=None) -> None:
 
         self.xdata = xdata
         self.ydata = ydata
@@ -72,10 +35,11 @@ class Plot:
         self.fmt2 = fmt2
         self.ms = ms
         self.ax.grid(grid)
+        self.lw = lw
 
         if no_errbar:
             points = self.ax.plot(
-                self.xdata.values, self.ydata.values, fmt, label=label, ms=self.ms, color=color)
+                self.xdata.values, self.ydata.values, fmt, label=label, ms=self.ms, color=color, lw=self.lw)
             self.color = points[-1].get_color()
         elif no_points:
             self.color = None

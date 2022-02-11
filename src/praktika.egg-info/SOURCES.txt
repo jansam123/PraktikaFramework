@@ -3,8 +3,13 @@ README.md
 pyproject.toml
 setup.cfg
 setup.py
+src/praktika/Data.py
+src/praktika/LatexTable.py
+src/praktika/LoadData.py
+src/praktika/Plot.py
+src/praktika/PlotExperimetnal.py
+src/praktika/Table.py
 src/praktika/__init__.py
-src/praktika/classMA.py
 src/praktika/functions.py
 src/praktika.egg-info/PKG-INFO
 src/praktika.egg-info/SOURCES.txt
